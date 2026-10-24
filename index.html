@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cẩm Nang Truy Vấn SQL & Bộ Câu Hỏi Vấn Đáp - Shoppa DB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-subtle: #273549;
+            --bg-code: #0b1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-accent: #38bdf8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --purple: #a855f7;
+            --border: #334155;
+            --border-highlight: #475569;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-subtle: #f1f5f9;
+            --bg-code: #0f172a;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-accent: #0284c7;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border: #e2e8f0;
+            --border-highlight: #cbd5e1;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.65;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            scroll-behavior: smooth;
+        }
+
+        /* Top Header */
+        header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 2.5rem 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        /* Layout Container */
+        .layout {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem 4rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: sticky;
+            top: 6.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-list li {
+            margin-bottom: 0.35rem;
+        }
+
+        .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .nav-list a:hover, .nav-list a.active {
+            background-color: var(--bg-card-subtle);
+            color: var(--text-accent);
+        }
+
+        .search-box {
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background-color: var(--bg-card-subtle);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Main Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+            scroll-margin-top: 6.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+        .badge-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+
+        .section-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        /* SQL Syntax Cards */
+        .syntax-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1.25rem 0;
+        }
+
+        .syntax-item {
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .syntax-keyword {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-accent);
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .syntax-order-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+        }
+
+        .syntax-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .syntax-example {
+            margin-top: 0.4rem;
+            background: var(--bg-code);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Step Process Box (Order of execution) */
+        .pipeline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 1.25rem 0;
+            padding: 1rem;
+            background: var(--bg-card-subtle);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border-highlight);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-accent);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .pipeline-step span {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .pipeline-arrow {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        /* Q&A Accordion Style */
+        .qa-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .qa-card {
+            background: var(--bg-card-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .qa-card:hover {
+            border-color: var(--border-highlight);
+        }
+
+        .qa-card.trap {
+            border-left: 4px solid var(--amber);
+        }
+
+        .qa-card.critical {
+            border-left: 4px solid var(--rose);
+        }
+
+        .qa-header {
+            padding: 1.1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            cursor: pointer;
+            gap: 1rem;
+            user-select: none;
+        }
+
+        .qa-title-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .qa-tag {
+            align-self: flex-start;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .tag-trap { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .tag-core { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag-norm { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .tag-sql { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+        .qa-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: transform 0.2s ease;
+        }
+
+        .qa-card.active .toggle-icon {
+            transform: rotate(180deg);
+            color: var(--text-accent);
+        }
+
+        .qa-body {
+            padding: 0 1.25rem 1.25rem;
+            display: block;
+            border-top: 1px solid var(--border);
+            font-size: 0.925rem;
+            color: var(--text-main);
+        }
+
+        .qa-body p {
+            margin-top: 0.75rem;
+        }
+
+        .qa-body ul, .qa-body ol {
+            margin-top: 0.5rem;
+            padding-left: 1.3rem;
+        }
+
+        .qa-body li {
+            margin-bottom: 0.4rem;
+        }
+
+        .highlight-box {
+            margin-top: 0.75rem;
+            padding: 0.8rem 1rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--amber);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .highlight-box strong {
+            color: #fbbf24;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            position: relative;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 0.75rem 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            color: var(--text-main);
+            border-color: var(--text-accent);
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--border);
+            padding: 0.65rem 0.85rem;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: var(--bg-card-subtle);
+            font-weight: 700;
+            color: var(--text-accent);
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--emerald);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Cẩm Nang SQL & Vấn Đáp Bảo Vệ CSDL</h1>
+                <p>Học phần: Cơ sở dữ liệu (FIT4005) • Đề tài: Quản lý Bán Hàng Shoppa • SV: Nguyễn Hoàng Vĩnh Giang</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="themeToggle" onclick="toggleTheme()">🌓 Đổi Giao Diện</button>
+                <button class="btn btn-primary" onclick="expandAllQAs()">📖 Mở/Thu Tất Cả</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm câu hỏi / từ khóa..." oninput="filterContent()">
+            </div>
+            <h3>Mục Lục Nhanh</h3>
+            <ul class="nav-list">
+                <li><a href="#syntax-guide">📘 Cẩm Nang Cú Pháp SQL</a></li>
+                <li><a href="#execution-order">⚙️ Thứ Tự Thực Thi SQL</a></li>
+                <li><a href="#sec-1">1. Thiết Kế Khái Niệm (ERD)</a></li>
+                <li><a href="#sec-2">2. Thiết Kế Logic (Khóa)</a></li>
+                <li><a href="#sec-3">3. Kiểm Chứng (Bẫy Đơn Giá)</a></li>
+                <li><a href="#sec-4">4. Chuẩn Hóa (1NF-2NF-3NF)</a></li>
+                <li><a href="#sec-5">5. Chi Tiết Bảng & Ràng Buộc</a></li>
+                <li><a href="#sec-6">6. Thực Thi SQL (4 Truy Vấn)</a></li>
+                <li><a href="#slide-summary">📊 Dàn Ý Trình Bày Slide</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+
+            <!-- SECTION: SQL SYNTAX GUIDE -->
+            <section id="syntax-guide" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-blue">SQL</div>
+                    <div>
+                        <h2>Cẩm Nang Cú Pháp & Cách Dùng Mệnh Đề SQL</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Ôn lại trọn vẹn cách viết, vai trò và ví dụ cụ thể của các câu lệnh đã học</p>
+                    </div>
+                </div>
+
+                <p>Cấu trúc câu truy vấn chuẩn trong ngôn ngữ SQL gồm 6 mệnh đề kinh điển được viết theo thứ tự:</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>CÚ PHÁP TỔNG QUÁT (VIẾT TAY / CODE)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                    </div>
+                    <pre><code>SELECT    [DISTINCT / TOP n] TenCot1, TenCot2, SUM(Cot) ...
+FROM      TenBang1 [INNER JOIN / LEFT JOIN TenBang2 ON DieuKienKhoa]
+WHERE     DieuKienLocTungDong (SoSanh, AND, OR, LIKE, IN...)
+GROUP BY  TenCotGomNhom1, TenCotGomNhom2 ...
+HAVING    DieuKienLocTrenNhom (SUM, COUNT, AVG, MAX, MIN...)
+ORDER BY  TenCotSapXep [ASC (Mặc định) / DESC (Giảm dần)];</code></pre>
+                </div>
+
+                <!-- Syntax Items Grid -->
+                <div class="syntax-grid">
+                    <!-- SELECT -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            SELECT
+                            <span class="syntax-order-badge">Thực thi thứ 5</span>
+                        </div>
+                        <div class="syntax-desc">Chỉ định các cột dữ liệu hoặc biểu thức tính toán muốn hiển thị trên màn hình kết quả.</div>
+                        <div class="syntax-example">SELECT MaKH, TenKH, SoDienThoai</div>
+                    </div>
+
+                    <!-- FROM -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            FROM & JOIN
+                            <span class="syntax-order-badge">Thực thi thứ 1</span>
+                        </div>
+                        <div class="syntax-desc">Xác định bảng nguồn chứa dữ liệu. Dùng <code>INNER JOIN ... ON</code> để ghép 2 bảng qua khóa ngoại.</div>
+                        <div class="syntax-example">FROM DON_HANG DH INNER JOIN KHACH_HANG KH ON DH.MaKH = KH.MaKH</div>
+                    </div>
+
+                    <!-- WHERE -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            WHERE
+                            <span class="syntax-order-badge">Thực thi thứ 2</span>
+                        </div>
+                        <div class="syntax-desc">Lọc từng dòng đơn lẻ <strong>trước khi gom nhóm</strong>. <span style="color:var(--rose)">Tuyệt đối KHÔNG dùng hàm gộp (SUM, COUNT) trong WHERE!</span></div>
+                        <div class="syntax-example">WHERE DonGia >= 500000 AND LoaiSP = N'Phụ kiện'</div>
+                    </div>
+
+                    <!-- GROUP BY -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            GROUP BY
+                            <span class="syntax-order-badge">Thực thi thứ 3</span>
+                        </div>
+                        <div class="syntax-desc">Gom nhóm các bản ghi có chung giá trị (như cùng mã đơn, cùng loại hàng) để tính tổng, trung bình, đếm.</div>
+                        <div class="syntax-example">GROUP BY DH.MaDH, KH.TenKH</div>
+                    </div>
+
+                    <!-- HAVING -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            HAVING
+                            <span class="syntax-order-badge">Thực thi thứ 4</span>
+                        </div>
+                        <div class="syntax-desc">Lọc điều kiện <strong>sau khi đã gom nhóm</strong>. <span style="color:var(--emerald)">Chuyên dùng cho hàm gộp SUM, COUNT, AVG!</span></div>
+                        <div class="syntax-example">HAVING SUM(SoLuong * DonGia) > 1000000</div>
+                    </div>
+
+                    <!-- ORDER BY -->
+                    <div class="syntax-item">
+                        <div class="syntax-keyword">
+                            ORDER BY
+                            <span class="syntax-order-badge">Thực thi thứ 6</span>
+                        </div>
+                        <div class="syntax-desc">Sắp xếp bảng kết quả cuối cùng: <code>ASC</code> (tăng dần từ A-Z, 0-9) hoặc <code>DESC</code> (giảm dần từ lớn đến bé).</div>
+                        <div class="syntax-example">ORDER BY TongSoLuongBan DESC</div>
+                    </div>
+                </div>
+
+                <!-- Execution Pipeline -->
+                <div id="execution-order" style="margin-top: 1.5rem;">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">⚙️ Thứ Tự Máy Tính Thực Thi Logic (Rất Hay Bị Hỏi Vấn Đáp):</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Sinh viên thường nhầm máy tính chạy SELECT trước. Thực tế SQL Server thực thi theo trình tự ngầm sau:</p>
+                    
+                    <div class="pipeline">
+                        <div class="pipeline-step"><span>1.</span> FROM & JOIN</div>
+                        <div class="pipeline-arrow">➔</div>
+                        <div class="pipeline-step"><span>2.</span> WHERE</div>
+                        <div class="pipeline-arrow">➔</div>
+                        <div class="pipeline-step"><span>3.</span> GROUP BY</div>
+                        <div class="pipeline-arrow">➔</div>
+                        <div class="pipeline-step"><span>4.</span> HAVING</div>
+                        <div class="pipeline-arrow">➔</div>
+                        <div class="pipeline-step"><span>5.</span> SELECT</div>
+                        <div class="pipeline-arrow">➔</div>
+                        <div class="pipeline-step"><span>6.</span> ORDER BY</div>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>📌 Lưu ý vàng khi thi:</strong> Vì <code>WHERE</code> chạy trước <code>SELECT</code>, nên bạn <em>không thể</em> dùng tên cột bí danh (Alias đặt bằng chữ <code>AS</code>) trong mệnh đề <code>WHERE</code>. Nhưng đến <code>ORDER BY</code> (chạy cuối cùng) thì hoàn toàn được dùng tên cột bí danh!
+                    </div>
+                </div>
+
+                <!-- Aggregation Cheat Sheet -->
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">📊 Bảng 5 Hàm Tổng Hợp (Aggregate Functions) Kinh Điển:</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tên Hàm</th>
+                                <th>Ý Nghĩa Nghiệp Vụ</th>
+                                <th>Ví Dụ Áp Dụng Thực Tế (Shoppa DB)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>SUM(cột)</code></td>
+                                <td>Tính tổng giá trị các số</td>
+                                <td><code>SUM(SoLuong * DonGia)</code> ➔ Tính tổng doanh thu / tổng tiền hóa đơn</td>
+                            </tr>
+                            <tr>
+                                <td><code>COUNT(*)</code> hoặc <code>COUNT(cột)</code></td>
+                                <td>Đếm số dòng / số bản ghi</td>
+                                <td><code>COUNT(MaDH)</code> ➔ Đếm xem khách hàng đã mua bao nhiêu đơn hàng</td>
+                            </tr>
+                            <tr>
+                                <td><code>AVG(cột)</code></td>
+                                <td>Tính giá trị trung bình cộng</td>
+                                <td><code>AVG(DonGia)</code> ➔ Tính giá bán trung bình của một loại hàng hóa</td>
+                            </tr>
+                            <tr>
+                                <td><code>MAX(cột)</code></td>
+                                <td>Lấy giá trị lớn nhất</td>
+                                <td><code>MAX(DonGia)</code> ➔ Tìm đơn giá đắt nhất trong danh mục sản phẩm</td>
+                            </tr>
+                            <tr>
+                                <td><code>MIN(cột)</code></td>
+                                <td>Lấy giá trị nhỏ nhất</td>
+                                <td><code>MIN(DonGia)</code> ➔ Tìm sản phẩm có giá rẻ nhất trong hệ thống</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 1: CONCEPTUAL DESIGN -->
+            <section id="sec-1" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-blue">1</div>
+                    <div>
+                        <h2>1. Thiết Kế Khái Niệm (Conceptual Design)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Thực thể, Thuộc tính, Phân loại thuộc tính và Mối liên kết ERD</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q1.1 -->
+                    <div class="qa-card" data-tags="erd thuc-the">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Thực Thể & Nghiệp Vụ</span>
+                                <div class="qa-title">Câu 1.1: Hệ thống Shoppa gồm những thực thể nào? Tại sao lại xác định các thực thể đó?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Trả lời:</strong> Hệ thống gồm <strong>3 thực thể thực tế chính</strong> và <strong>1 thực thể liên kết</strong>:</p>
+                            <ul>
+                                <li><strong>`KHACH_HANG` (Khách hàng):</strong> Lưu trữ đối tượng tham gia giao dịch mua sắm (hồ sơ liên lạc, địa chỉ nhận hàng).</li>
+                                <li><strong>`SAN_PHAM` (Sản phẩm):</strong> Hàng hóa công ty kinh doanh phân phối (tên hàng, giá niêm yết, chủng loại).</li>
+                                <li><strong>`DON_HANG` (Đơn hàng):</strong> Giao dịch phát sinh khi một khách hàng tiến hành chốt đơn (mã đơn, thời gian đặt).</li>
+                                <li><strong>`CHI_TIET_DON_HANG` (Chi tiết đơn hàng):</strong> Thực thể liên kết (Junction/Weak Entity) giải quyết mối quan hệ Nhiều - Nhiều ($N - N$) giữa Đơn hàng và Sản phẩm.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q1.2 -->
+                    <div class="qa-card" data-tags="thuoc-tinh erd">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Thuộc Tính</span>
+                                <div class="qa-title">Câu 1.2: Các thuộc tính được phân loại như thế nào? Cột Tổng Tiền nằm ở đâu?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><strong>Thuộc tính định danh (Khóa):</strong> <code>MaKH</code>, <code>MaSP</code>, <code>MaDH</code>.</li>
+                                <li><strong>Thuộc tính đơn trị:</strong> <code>TenKH</code>, <code>Email</code>, <code>SoDienThoai</code>, <code>DiaChi</code>, <code>TenSP</code>, <code>DonGia</code>, <code>LoaiSP</code>, <code>NgayDatHang</code>, <code>SoLuong</code>.</li>
+                                <li><strong>Thuộc tính dẫn xuất (Derived Attribute):</strong> Thuộc tính <code>TongTien</code> của đơn hàng được tính động bằng biểu thức toán học <code>SUM(SoLuong * DonGia)</code>, <strong>tuyệt đối không lưu cứng</strong> vào bảng để tránh sai lệch dữ liệu khi người dùng sửa số lượng.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q1.3 -->
+                    <div class="qa-card" data-tags="lien-ket ban-so">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Liên Kết & Bản Số</span>
+                                <div class="qa-title">Câu 1.3: Phân tích các mối liên kết (Relationship) và bản số (Cardinality) giữa các thực thể?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><strong>KHACH_HANG – DON_HANG (Liên kết 1 - N):</strong>
+                                    <ul>
+                                        <li>1 khách hàng có thể chưa mua hoặc đã mua nhiều đơn hàng (Bản số: $0..N$).</li>
+                                        <li>1 đơn hàng bắt buộc phải thuộc về duy nhất 1 khách hàng xác định (Bản số: $1..1$).</li>
+                                    </ul>
+                                </li>
+                                <li><strong>DON_HANG – SAN_PHAM (Liên kết N - N):</strong>
+                                    <ul>
+                                        <li>1 đơn hàng có thể chứa nhiều sản phẩm; 1 sản phẩm có thể được mua trong nhiều đơn hàng.</li>
+                                        <li>Liên kết này mang thuộc tính riêng là <code>SoLuong</code> và <code>DonGia</code> tại thời điểm mua, do đó được tách thành thực thể kết hợp <code>CHI_TIET_DON_HANG</code> qua hai liên kết $1 - N$.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: LOGICAL DESIGN -->
+            <section id="sec-2" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-amber">2</div>
+                    <div>
+                        <h2>2. Thiết Kế Logic (Logical Design)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Mô hình quan hệ, Khóa chính, Khóa ngoại và Khóa kết hợp</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q2.1 -->
+                    <div class="qa-card" data-tags="chuyen-doi erd-logic">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Chuyển Đổi Sơ Đồ</span>
+                                <div class="qa-title">Câu 2.1: Quy tắc chuyển từ sơ đồ ERD sang các Bảng quan hệ (Tables) được thực hiện như thế nào?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Quy tắc chuẩn:</strong></p>
+                            <ol>
+                                <li><strong>Thực thể thông thường:</strong> Biến thành bảng, thuộc tính định danh thành Khóa chính (<code>KHACH_HANG</code>, <code>SAN_PHAM</code>).</li>
+                                <li><strong>Quan hệ 1 - N:</strong> Lấy khóa chính bên "1" đặt làm Khóa ngoại ở bảng bên "N". (Đặt <code>MaKH</code> vào bảng <code>DON_HANG</code>).</li>
+                                <li><strong>Quan hệ N - N:</strong> Tạo bảng trung gian (<code>CHI_TIET_DON_HANG</code>), nhận 2 khóa chính của 2 bảng liên kết làm Khóa ngoại và gộp chúng lại làm Khóa chính kết hợp.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Q2.2 -->
+                    <div class="qa-card trap" data-tags="khoa-chinh khoa-ket-hop">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-trap">Câu Hỏi Hay Gặp</span>
+                                <div class="qa-title">Câu 2.2: Khóa chính của bảng CHI_TIET_DON_HANG là gì? Tại sao lại dùng 2 trường?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Trả lời:</strong> Khóa chính của <code>CHI_TIET_DON_HANG</code> là <strong>Khóa phức hợp / Khóa kết hợp (Composite Primary Key)</strong> gồm 2 cột: <code>(MaDH, MaSP)</code>.</p>
+                            <div class="highlight-box">
+                                <strong>Lý do thiết kế:</strong> Một đơn hàng có thể có nhiều sản phẩm, nhưng mỗi mã sản phẩm chỉ được xuất hiện <strong>đúng 1 dòng</strong> trong cùng 1 đơn hàng. Nếu khách mua nhiều cái thì tăng ở cột <code>SoLuong</code>. Việc dùng cặp <code>(MaDH, MaSP)</code> ngăn chặn triệt để lỗi nhập trùng 2 dòng cùng 1 sản phẩm trong 1 hóa đơn.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q2.3 -->
+                    <div class="qa-card" data-tags="khoa-ngoai fk">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Khóa Ngoại</span>
+                                <div class="qa-title">Câu 2.3: Hệ thống có những Khóa ngoại (Foreign Key) nào? Vai trò của chúng là gì?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><code>DON_HANG(MaKH)</code> ➔ Tham chiếu đến <code>KHACH_HANG(MaKH)</code>.</li>
+                                <li><code>CHI_TIET_DON_HANG(MaDH)</code> ➔ Tham chiếu đến <code>DON_HANG(MaDH)</code>.</li>
+                                <li><code>CHI_TIET_DON_HANG(MaSP)</code> ➔ Tham chiếu đến <code>SAN_PHAM(MaSP)</code>.</li>
+                            </ul>
+                            <p><strong>Vai trò:</strong> Đảm bảo <strong>tính toàn vẹn tham chiếu (Referential Integrity)</strong>. Hệ thống sẽ ngăn chặn việc tạo ra các "đơn hàng mồ côi" (không biết ai đặt) hoặc chi tiết đơn hàng trỏ tới mã hàng hóa không tồn tại.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: DESIGN VERIFICATION -->
+            <section id="sec-3" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-rose">3</div>
+                    <div>
+                        <h2>3. Kiểm Chứng Thiết Kế (Design Verification)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Kiểm tra tính đúng đắn logic, quy tắc nghiệp vụ và câu hỏi bẫy dư thừa dữ liệu</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q3.1 -->
+                    <div class="qa-card" data-tags="logic nghiep-vu">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Kiểm Chứng Logic & Nghiệp Vụ</span>
+                                <div class="qa-title">Câu 3.1: Cơ sở dữ liệu này đảm bảo đúng Logic và đúng Nghiệp vụ bán hàng thế nào?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><strong>Đúng Logic:</strong> Các bảng liên kết chặt chẽ qua PK/FK, không có vòng lặp tham chiếu, không có bản ghi mồ côi.</li>
+                                <li><strong>Đúng Nghiệp Vụ:</strong> Cho phép một khách hàng mua sắm nhiều lần (lưu lịch sử đơn hàng), một đơn hàng chứa nhiều món hàng với số lượng tùy ý, kiểm soát dữ liệu hợp lệ (số lượng > 0, giá tiền >= 0).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q3.2 (TRAP) -->
+                    <div class="qa-card critical" data-tags="bay-kinh-dien don-gia du-thua">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-trap" style="background: rgba(244, 63, 94, 0.2); color: #fb7185;">⚠️ Bẫy Kinh Điển Giảng Viên Rất Hay Hỏi</span>
+                                <div class="qa-title">Câu 3.2: Tại sao bảng CHI_TIET_DON_HANG lại có DonGia khi bảng SAN_PHAM đã có DonGia? Có bị dư thừa không?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p style="font-weight: 700; color: #fb7185; font-size: 1.05rem;">Dạ KHÔNG hề dư thừa, đây là yêu cầu sống còn của nghiệp vụ kế toán thương mại:</p>
+                            <ul>
+                                <li><strong><code>DonGia</code> trong bảng <code>SAN_PHAM</code>:</strong> Là <em>giá bán niêm yết hiện hành</em>. Giá này có thể thay đổi liên tục theo thời gian, lạm phát hoặc các đợt khuyến mãi giảm giá.</li>
+                                <li><strong><code>DonGia</code> trong bảng <code>CHI_TIET_DON_HANG</code>:</strong> Là <em>giá chốt bán tại thời điểm khách hàng đặt mua</em> (Historical Price).</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <strong>Hậu quả nếu bỏ DonGia ở CHI_TIET_DON_HANG:</strong> Nếu sau 6 tháng công ty tăng giá sản phẩm từ 350.000đ lên 500.000đ, thì toàn bộ các đơn hàng đã bán thành công trong quá khứ khi chạy lệnh tính tổng tiền sẽ bị đội giá theo giá mới, làm <strong>sai lệch hoàn toàn báo cáo doanh thu, sổ sách kế toán và thuế</strong>!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q3.3 -->
+                    <div class="qa-card" data-tags="thuoc-tinh-du-thua">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-core">Tối Ưu</span>
+                                <div class="qa-title">Câu 3.3: Trong thiết kế có thuộc tính dư thừa nào cần xóa bỏ không?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Trả lời:</strong> Không có thuộc tính dư thừa. Em đã chủ động <strong>không đưa các thuộc tính tính toán sẵn</strong> (như <code>ThanhTien = SoLuong * DonGia</code> hoặc <code>TongTienDonHang</code>) vào cấu trúc bảng lưu trữ. Mọi giá trị này đều được tính động qua câu lệnh SQL DQL để đảm bảo tính nhất quán dữ liệu cao nhất.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: NORMALIZATION -->
+            <section id="sec-4" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-emerald">4</div>
+                    <div>
+                        <h2>4. Chuẩn Hóa Dữ Liệu (1NF ➔ 2NF ➔ 3NF)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Chứng minh chi tiết các bước chuẩn hóa, loại bỏ dị thường và phụ thuộc hàm</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q4.1 -->
+                    <div class="qa-card" data-tags="chuan-hoa 1nf">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-norm">Chuẩn 1NF</span>
+                                <div class="qa-title">Câu 4.1: Hãy định nghĩa và chứng minh CSDL của bạn đạt chuẩn 1NF?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Định nghĩa:</strong> Một quan hệ đạt 1NF khi và chỉ khi mọi thuộc tính đều có miền giá trị <strong>nguyên tố (Atomic Values)</strong>, không chứa thuộc tính đa trị hay nhóm lặp.</p>
+                            <p><strong>Chứng minh:</strong></p>
+                            <ul>
+                                <li>Mọi ô dữ liệu (giao giữa dòng và cột) chỉ chứa duy nhất 1 giá trị đơn, không có ô nào lưu danh sách kiểu <code>"SP01, SP02"</code>.</li>
+                                <li>Mỗi sản phẩm trong đơn hàng đều được tách thành 1 dòng riêng trong bảng <code>CHI_TIET_DON_HANG</code>.</li>
+                                <li>Tất cả các bảng đều đã được gán Khóa chính duy nhất xác định từng hàng. ➔ <strong>Đạt 1NF</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q4.2 -->
+                    <div class="qa-card" data-tags="chuan-hoa 2nf">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-norm">Chuẩn 2NF</span>
+                                <div class="qa-title">Câu 4.2: Hãy định nghĩa và chứng minh CSDL của bạn đạt chuẩn 2NF?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Định nghĩa:</strong> Đạt 1NF VÀ mọi thuộc tính không khóa phải <strong>phụ thuộc hàm đầy đủ (Full functional dependency)</strong> vào toàn bộ khóa chính, không phụ thuộc vào một phần của khóa chính phức hợp.</p>
+                            <p><strong>Chứng minh:</strong></p>
+                            <ul>
+                                <li>Các bảng <code>KHACH_HANG</code>, <code>SAN_PHAM</code>, <code>DON_HANG</code> đều có Khóa chính đơn gồm 1 cột nên <em>mặc nhiên thỏa mãn 2NF</em>.</li>
+                                <li>Riêng bảng <code>CHI_TIET_DON_HANG</code> có Khóa chính kết hợp là <code>(MaDH, MaSP)</code>:
+                                    <ul>
+                                        <li>Cột <code>SoLuong</code> và <code>DonGia</code> phụ thuộc vào cả 2 thành phần <code>(MaDH, MaSP)</code> (biết đơn nào và mua sản phẩm nào mới biết số lượng).</li>
+                                        <li>Các thuộc tính chỉ phụ thuộc vào <code>MaSP</code> (như <code>TenSP</code>, <code>LoaiSP</code>) đã được tách riêng sang bảng <code>SAN_PHAM</code>.</li>
+                                        <li>Thuộc tính chỉ phụ thuộc vào <code>MaDH</code> (như <code>NgayDatHang</code>) đã tách sang bảng <code>DON_HANG</code>.</li>
+                                    </ul>
+                                </li>
+                                <li>➔ Không còn phụ thuộc hàm từng phần. ➔ <strong>Đạt 2NF</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q4.3 -->
+                    <div class="qa-card" data-tags="chuan-hoa 3nf">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-norm">Chuẩn 3NF</span>
+                                <div class="qa-title">Câu 4.3: Hãy định nghĩa và chứng minh CSDL của bạn đạt chuẩn 3NF?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Định nghĩa:</strong> Đạt 2NF VÀ <strong>không tồn tại phụ thuộc hàm bắc cầu (Transitive dependency)</strong> giữa các thuộc tính không khóa (tức là không có trường hợp thuộc tính không khóa A suy ra thuộc tính không khóa B).</p>
+                            <p><strong>Chứng minh:</strong></p>
+                            <ul>
+                                <li>Trong quan hệ đơn hàng: <code>MaDH ➔ MaKH</code>, đồng thời <code>MaKH ➔ TenKH, Email, DiaChi</code>. Đây là phụ thuộc hàm bắc cầu: <code>MaDH ➔ MaKH ➔ TenKH</code>.</li>
+                                <li>Để loại bỏ dị thường này, em đã <strong>tách riêng toàn bộ thông tin khách hàng ra bảng `KHACH_HANG`</strong>, và chỉ giữ lại cột <code>MaKH</code> làm Khóa ngoại trong <code>DON_HANG</code>.</li>
+                                <li>Trong các bảng hiện tại, không có thuộc tính không khóa nào quyết định hàm thuộc tính không khóa khác. ➔ <strong>Toàn bộ CSDL đạt chuẩn 3NF</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: TABLE DETAILS -->
+            <section id="sec-5" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-purple">5</div>
+                    <div>
+                        <h2>5. Mô Tả Chi Tiết Các Bảng & Ràng Buộc</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Kiểu dữ liệu SQL Server, Ràng buộc toàn vẹn (CHECK, UNIQUE, NOT NULL, CASCADE)</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q5.1 -->
+                    <div class="qa-card" data-tags="kieu-du-lieu data-types">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Kiểu Dữ Liệu</span>
+                                <div class="qa-title">Câu 5.1: Vì sao chọn VARCHAR cho mã, NVARCHAR cho tên và DECIMAL cho tiền tệ?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><code>VARCHAR(10)</code>: Dành cho mã (<code>MaKH</code>, <code>MaSP</code>, <code>MaDH</code>) vì các mã này chỉ gồm chữ cái tiếng Anh và số không dấu, dùng <code>VARCHAR</code> tiết kiệm đúng 50% dung lượng so với <code>NVARCHAR</code>.</li>
+                                <li><code>NVARCHAR(100) / (255)</code>: Dành cho <code>TenKH</code>, <code>TenSP</code>, <code>DiaChi</code> để hỗ trợ bộ mã Unicode tiếng Việt có dấu hoàn chỉnh, không bao giờ bị lỗi font hỏi chấm <code>???</code>.</li>
+                                <li><code>DECIMAL(12, 2)</code>: Dành cho <code>DonGia</code> để lưu trữ số tiền chính xác tuyệt đối. <strong>Tuyệt đối không dùng FLOAT hay REAL</strong> vì các kiểu số thực dấu phẩy động sẽ gây ra sai số làm tròn khi nhân chia tiền tỉ!</li>
+                                <li><code>INT</code> cho <code>SoLuong</code> (số nguyên đếm được) và <code>DATE</code> cho <code>NgayDatHang</code> (chuẩn <code>YYYY-MM-DD</code>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q5.2 -->
+                    <div class="qa-card" data-tags="rang-buoc constraints check">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Ràng Buộc Toàn Vẹn</span>
+                                <div class="qa-title">Câu 5.2: Bạn đã cài đặt những ràng buộc nghiệp vụ nào trong DDL? ON UPDATE CASCADE là gì?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <ul>
+                                <li><strong>PRIMARY KEY:</strong> Định danh hàng duy nhất.</li>
+                                <li><strong>FOREIGN KEY:</strong> Ràng buộc mối quan hệ cha con giữa các bảng.</li>
+                                <li><strong>UNIQUE:</strong> Cột <code>Email</code> của khách hàng là duy nhất, không cho phép 2 khách hàng dùng chung email.</li>
+                                <li><strong>NOT NULL:</strong> Bắt buộc phải nhập dữ liệu cho tên, ngày đặt hàng, số lượng, đơn giá.</li>
+                                <li><strong>CHECK:</strong>
+                                    <ul>
+                                        <li><code>CHECK (DonGia >= 0)</code>: Ngăn chặn nhập giá tiền âm.</li>
+                                        <li><code>CHECK (SoLuong > 0)</code>: Đảm bảo khách hàng mua ít nhất 1 sản phẩm.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>ON UPDATE CASCADE:</strong> Khi người quản trị sửa mã ở bảng cha (ví dụ đổi mã đơn <code>DH01</code> thành <code>DH100</code>), hệ thống sẽ tự động cập nhật đồng bộ sang bảng chi tiết đơn hàng mà không báo lỗi.</li>
+                                <li><strong>ON DELETE NO ACTION:</strong> Chặn không cho xóa một khách hàng nếu họ đã có đơn hàng trong hệ thống (bảo vệ chứng từ hóa đơn).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 6: PHYSICAL SQL QUERIES -->
+            <section id="sec-6" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-blue">6</div>
+                    <div>
+                        <h2>6. Thực Thi Câu Truy Vấn Vật Lý (SQL Server)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Phân tích chi tiết 4 câu truy vấn đề bài + Câu hỏi mở rộng áp dụng HAVING</p>
+                    </div>
+                </div>
+
+                <div class="qa-container">
+                    <!-- Q6.1: Query 1 -->
+                    <div class="qa-card" data-tags="cau-1 select from">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Truy Vấn 1</span>
+                                <div class="qa-title">Câu 6.1: Câu 1 - Liệt kê toàn bộ khách hàng trong hệ thống</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Cú pháp sử dụng:</strong> <code>SELECT</code> các cột cần hiển thị và <code>FROM</code> bảng <code>KHACH_HANG</code>.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>SQL QUERY 1</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                                </div>
+                                <pre><code>SELECT 
+    MaKH, 
+    TenKH, 
+    Email, 
+    SoDienThoai, 
+    DiaChi
+FROM KHACH_HANG;</code></pre>
+                            </div>
+                            <p><strong>Kết quả trả về:</strong> Đầy đủ 6 khách hàng thực tế (Hà Nội, TP.HCM, Đà Nẵng, Hải Phòng, Cần Thơ).</p>
+                        </div>
+                    </div>
+
+                    <!-- Q6.2: Query 2 -->
+                    <div class="qa-card" data-tags="cau-2 inner-join where">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Truy Vấn 2</span>
+                                <div class="qa-title">Câu 6.2: Câu 2 - Tìm tất cả đơn hàng của một khách hàng cụ thể (Ví dụ: 'KH01')</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Cú pháp sử dụng:</strong> Kết nối 2 bảng bằng <code>INNER JOIN ... ON</code> qua khóa ngoại <code>MaKH</code> và lọc bằng <code>WHERE</code>.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>SQL QUERY 2</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                                </div>
+                                <pre><code>SELECT 
+    DH.MaDH, 
+    DH.NgayDatHang, 
+    KH.MaKH, 
+    KH.TenKH, 
+    KH.SoDienThoai
+FROM DON_HANG DH
+INNER JOIN KHACH_HANG KH ON DH.MaKH = KH.MaKH
+WHERE KH.MaKH = 'KH01';</code></pre>
+                            </div>
+                            <p><strong>Kết quả trả về:</strong> Khách hàng Nguyễn Văn An (<code>KH01</code>) đã đặt 2 đơn hàng là <code>DH01</code> (ngày 10/05/2024) và <code>DH03</code> (ngày 12/05/2024).</p>
+                        </div>
+                    </div>
+
+                    <!-- Q6.3: Query 3 -->
+                    <div class="qa-card" data-tags="cau-3 sum group-by">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Truy Vấn 3</span>
+                                <div class="qa-title">Câu 6.3: Câu 3 - Tính tổng giá trị của một đơn hàng</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Cú pháp sử dụng:</strong> Hàm gộp <code>SUM(SoLuong * DonGia)</code>, điều kiện lọc <code>WHERE MaDH = 'DH01'</code> và gom nhóm <code>GROUP BY MaDH</code>.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>SQL QUERY 3 (1 ĐƠN CỤ THỂ)</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                                </div>
+                                <pre><code>SELECT 
+    MaDH, 
+    SUM(SoLuong * DonGia) AS TongGiaTriDonHang
+FROM CHI_TIET_DON_HANG
+WHERE MaDH = 'DH01'
+GROUP BY MaDH;</code></pre>
+                            </div>
+                            <p><strong>Kết quả:</strong> Đơn <code>DH01</code> có tổng tiền là <strong>1.350.000 VNĐ</strong> (gồm 2 chuột Logitech + 1 bàn phím cơ DareU).</p>
+                        </div>
+                    </div>
+
+                    <!-- Q6.4: Query 4 -->
+                    <div class="qa-card" data-tags="cau-4 top order-by">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-sql">Truy Vấn 4</span>
+                                <div class="qa-title">Câu 6.4: Câu 4 - Liệt kê 3 sản phẩm bán chạy nhất (Top 3 Best Sellers)</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Cú pháp sử dụng:</strong> <code>SELECT TOP 3</code> (trên SQL Server) kết hợp hàm gộp <code>SUM(CT.SoLuong)</code>, gom nhóm <code>GROUP BY</code> và sắp xếp giảm dần <code>ORDER BY TongSoLuongBan DESC</code>.</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>SQL QUERY 4 (SQL SERVER)</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                                </div>
+                                <pre><code>SELECT TOP 3 
+    SP.MaSP, 
+    SP.TenSP, 
+    SP.LoaiSP, 
+    SUM(CT.SoLuong) AS TongSoLuongBan
+FROM SAN_PHAM SP
+INNER JOIN CHI_TIET_DON_HANG CT ON SP.MaSP = CT.MaSP
+GROUP BY SP.MaSP, SP.TenSP, SP.LoaiSP
+ORDER BY TongSoLuongBan DESC;</code></pre>
+                            </div>
+                            <p><strong>Kết quả:</strong> Hạng 1: Chuột Logitech (6 cái), Hạng 2: Giá đỡ nhôm xoay (6 cái), Hạng 3: Bàn phím cơ DareU (3 cái).</p>
+                        </div>
+                    </div>
+
+                    <!-- Q6.5: Extension HAVING -->
+                    <div class="qa-card critical" data-tags="having mo-rong nang-cao">
+                        <div class="qa-header" onclick="toggleQA(this)">
+                            <div class="qa-title-wrap">
+                                <span class="qa-tag tag-trap" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">Câu Hỏi Nâng Cao Thầy Cô Rất Thích Hỏi</span>
+                                <div class="qa-title">Câu 6.5: Hãy viết câu lệnh áp dụng mệnh đề HAVING để lọc các đơn hàng có tổng giá trị > 1.000.000 VNĐ?</div>
+                            </div>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                        <div class="qa-body">
+                            <p><strong>Trả lời:</strong> Để lọc điều kiện trên kết quả tính toán của hàm gộp <code>SUM()</code>, ta bắt buộc phải sử dụng mệnh đề <strong>`HAVING`</strong> thay vì `WHERE`:</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>SQL MỞ RỘNG CÓ MỆNH ĐỀ HAVING</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">Sao chép</button>
+                                </div>
+                                <pre><code>SELECT 
+    DH.MaDH, 
+    DH.NgayDatHang, 
+    KH.TenKH, 
+    SUM(CT.SoLuong * CT.DonGia) AS TongTien
+FROM DON_HANG DH
+INNER JOIN KHACH_HANG KH ON DH.MaKH = KH.MaKH
+INNER JOIN CHI_TIET_DON_HANG CT ON DH.MaDH = CT.MaDH
+GROUP BY DH.MaDH, DH.NgayDatHang, KH.TenKH
+HAVING SUM(CT.SoLuong * CT.DonGia) > 1000000
+ORDER BY TongTien DESC;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: SLIDE SUMMARY -->
+            <section id="slide-summary" class="section-card">
+                <div class="section-header">
+                    <div class="badge-icon badge-emerald">📊</div>
+                    <div>
+                        <h2>Dàn Ý Nội Dung Trình Bày Slide (Slide Draft)</h2>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Các ý gạch đầu dòng cô đọng, sắc bén để bạn copy thẳng vào file PowerPoint mới</p>
+                    </div>
+                </div>
+
+                <div class="syntax-grid">
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 1: Thiết Kế Khái Niệm</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>3 thực thể chính: Khách hàng, Sản phẩm, Đơn hàng.</li>
+                            <li>1 thực thể liên kết: Chi tiết đơn hàng.</li>
+                            <li>Quan hệ 1-N và N-N với bản số chi tiết.</li>
+                            <li>Tổng tiền là thuộc tính dẫn xuất, tính động.</li>
+                        </ul>
+                    </div>
+
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 2: Thiết Kế Logic</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>Khóa chính PK: MaKH, MaSP, MaDH.</li>
+                            <li>Khóa phức hợp: (MaDH, MaSP) ở Chi tiết đơn hàng.</li>
+                            <li>Khóa ngoại FK bảo toàn tính toàn vẹn tham chiếu.</li>
+                            <li>Ngăn chặn trùng sản phẩm trên cùng 1 hóa đơn.</li>
+                        </ul>
+                    </div>
+
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 3: Kiểm Chứng Nghiệp Vụ</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>Đúng logic phân cấp và đúng thực tế mua sắm.</li>
+                            <li><strong>DonGia ở Chi tiết:</strong> Giá chốt tại thời điểm mua (Historical Price).</li>
+                            <li><strong>DonGia ở Sản phẩm:</strong> Giá niêm yết hiện hành.</li>
+                            <li>Không dư thừa, bảo vệ tính đúng đắn kế toán.</li>
+                        </ul>
+                    </div>
+
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 4: Chuẩn Hóa 3NF</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>1NF: Mọi thuộc tính đều nguyên tố, không nhóm lặp.</li>
+                            <li>2NF: Không phụ thuộc hàm từng phần vào khóa kết hợp.</li>
+                            <li>3NF: Loại bỏ phụ thuộc bắc cầu (tách Khách hàng).</li>
+                            <li>Kết quả: Không dị thường thêm, sửa, xóa.</li>
+                        </ul>
+                    </div>
+
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 5: Chi Tiết Bảng & Ràng Buộc</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>VARCHAR(10) tối ưu mã; NVARCHAR cho tiếng Việt.</li>
+                            <li>DECIMAL(12,2) tiền tệ chính xác (tránh lỗi FLOAT).</li>
+                            <li>CHECK: DonGia >= 0 và SoLuong > 0.</li>
+                            <li>UNIQUE Email, CASCADE UPDATE đồng bộ mã.</li>
+                        </ul>
+                    </div>
+
+                    <div class="syntax-item">
+                        <h4 style="color: var(--text-accent);">Slide 6: Cài Đặt SQL & Truy Vấn</h4>
+                        <ul style="font-size: 0.85rem; padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>Thực thi 4 câu lệnh DQL đúng chuẩn đề bài.</li>
+                            <li>Áp dụng đầy đủ: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY.</li>
+                            <li>INNER JOIN kết nối quan hệ chính xác.</li>
+                            <li>Hàm gộp SUM(SoLuong * DonGia) tính doanh số.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Đã sao chép vào bộ nhớ tạm!</div>
+
+    <script>
+        // Toggle theme dark/light
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+            localStorage.setItem('theme', targetTheme);
+        }
+
+        // Restore saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // Toggle individual QA accordion
+        function toggleQA(headerEl) {
+            const card = headerEl.closest('.qa-card');
+            const body = card.querySelector('.qa-body');
+            const icon = card.querySelector('.toggle-icon');
+            
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                card.classList.add('active');
+            } else {
+                body.style.display = 'none';
+                card.classList.remove('active');
+            }
+        }
+
+        // Expand or collapse all QAs
+        let allExpanded = true;
+        function expandAllQAs() {
+            allExpanded = !allExpanded;
+            const bodies = document.querySelectorAll('.qa-body');
+            const cards = document.querySelectorAll('.qa-card');
+            bodies.forEach(b => b.style.display = allExpanded ? 'block' : 'none');
+            cards.forEach(c => allExpanded ? c.classList.add('active') : c.classList.remove('active'));
+        }
+
+        // Copy code to clipboard
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block').querySelector('pre code');
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Live search/filter questions
+        function filterContent() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.qa-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
